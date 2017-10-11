@@ -1,6 +1,6 @@
 package org.samhsa.c2s.fis.config;
 
-import ca.uhn.fhir.rest.server.EncodingEnum;
+import ca.uhn.fhir.rest.api.EncodingEnum;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -35,7 +35,7 @@ public class FisProperties {
             @NotBlank
             private boolean enabled;
             @NotBlank
-            private String serverUrl;
+            private ServerUrl serverUrl;
             @NotBlank
             private String clientSocketTimeoutInMs;
             @NotBlank
@@ -43,6 +43,16 @@ public class FisProperties {
             @NotNull
             private EncodingEnum encoding = EncodingEnum.JSON;
         }
+
+    }
+
+    @Data
+    public static class ServerUrl {
+
+        @NotBlank
+        private String resource;
+
+        private String patient;
     }
 
     @Data

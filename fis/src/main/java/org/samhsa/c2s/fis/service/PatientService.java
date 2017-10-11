@@ -13,6 +13,5 @@ public interface PatientService {
 
     public void updateFhirPatient(UserDto userDto);
 
-    public String getPatientFhirResource(String patientMrn);
 
 }

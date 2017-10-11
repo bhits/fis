@@ -2,11 +2,16 @@ package org.samhsa.c2s.fis.config;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import ca.uhn.fhir.rest.client.IGenericClient;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.validation.FhirValidator;
+import org.hl7.fhir.dstu3.model.Patient;
+import org.hl7.fhir.dstu3.model.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class FhirServiceConfig {
@@ -22,9 +27,12 @@ public class FhirServiceConfig {
     }
 
     @Bean
-    public IGenericClient fhirClient() {
-        // Create a client
-        return fhirContext().newRestfulGenericClient(fisProperties.getFhir().getPublish().getServerUrl());
+    public Map<Class<? extends Resource>, IGenericClient> fhirClients() {
+        final Map<Class<? extends Resource>, IGenericClient> fhirClients = new HashMap<>();
+        if(fisProperties.getFhir().getPublish().getServerUrl().getPatient()!=null)
+            fhirClients.put(Patient.class, fhirContext().newRestfulGenericClient(fisProperties.getFhir().getPublish().getServerUrl().getPatient()));
+        fhirClients.put(Resource.class, fhirContext().newRestfulGenericClient(fisProperties.getFhir().getPublish().getServerUrl().getResource()));
+        return fhirClients;
     }
 
     @Bean
