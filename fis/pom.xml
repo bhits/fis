@@ -25,6 +25,7 @@
 		<spring-cloud.version>Dalston.SR3</spring-cloud.version>
 		<docker.maven.version>0.4.13</docker.maven.version>
 		<hapi.fhir.version>3.0.0</hapi.fhir.version>
+		<logstash-logback-encoder.version>4.11</logstash-logback-encoder.version>
 	</properties>
 
 	<dependencies>
@@ -71,6 +72,12 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>${logstash-logback-encoder.version}</version>
 		</dependency>
 
 		<!-- Test -->
