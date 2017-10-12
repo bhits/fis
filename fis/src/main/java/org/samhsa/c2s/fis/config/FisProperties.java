@@ -14,12 +14,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class FisProperties {
 
-    @Valid
-    private Ssn ssn;
-
-    @Valid
-    private Mrn mrn;
-
 
     @NotNull
     @Valid
@@ -54,24 +48,4 @@ public class FisProperties {
 
         private String patient;
     }
-
-    @Data
-    public static class Identifier {
-        @NotBlank
-        private String codeSystem;
-
-        @NotBlank
-        private String codeSystemOID;
-    }
-
-    @Data
-    public static class Mrn extends Identifier {
-    }
-
-
-    @Data
-    public static class Ssn extends Identifier {
-    }
-
-
 }

@@ -17,12 +17,14 @@ import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.samhsa.c2s.fis.config.FisProperties;
+import org.samhsa.c2s.fis.service.dto.IdentifierDto;
 import org.samhsa.c2s.fis.service.dto.UserDto;
 import org.samhsa.c2s.fis.service.exception.FHIRFormatErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -59,7 +61,7 @@ public class PatientServiceImpl implements PatientService {
 
         final ValidationResult validationResult = fhirValidator.validateWithResult(patient);
         if (validationResult.isSuccessful()) {
-            applyRequestEncoding(fhirClients.get(Patient.class).create().resource(patient)).execute();
+            applyRequestEncoding(fhirClients.getOrDefault(Patient.class,fhirClients.get(Resource.class)).create().resource(patient)).execute();
         } else {
             throw new FHIRFormatErrorException("FHIR Patient Validation is not successful" + validationResult.getMessages());
         }
@@ -72,17 +74,21 @@ public class PatientServiceImpl implements PatientService {
         if (validationResult.isSuccessful()) {
             if (fisProperties.getFhir().getPublish().isUseCreateForUpdate()) {
                 log.debug("Calling FHIR Patient Create for Update based on the configuration");
-                applyRequestEncoding(fhirClients.get(Patient.class).create().resource(patient)).execute();
+                applyRequestEncoding(fhirClients.getOrDefault(Patient.class,fhirClients.get(Resource.class)).create().resource(patient)).execute();
             } else {
                 log.debug("Calling FHIR Patient Update for Update based on the configuration");
-                applyRequestEncoding(fhirClients.get(Patient.class).update().resource(patient))
+                applyRequestEncoding(fhirClients.getOrDefault(Patient.class,fhirClients.get(Resource.class)).update().resource(patient))
                         .conditional()
-                        .where(Patient.IDENTIFIER.exactly().systemAndCode(fisProperties.getMrn().getCodeSystem(), patient.getId()))
+                        .where(Patient.IDENTIFIER.exactly().systemAndCode(getCodeSystemByValue(userDto.getIdentifiers().get(),patient.getId()), patient.getId()))
                         .execute();
             }
         } else {
             throw new FHIRFormatErrorException("FHIR Patient Validation is not successful" + validationResult.getMessages());
         }
+    }
+
+    private String getCodeSystemByValue(List<IdentifierDto> identifierList, String value){
+        return  identifierList.stream().filter(identifier -> identifier.getValue().equalsIgnoreCase(value)).findFirst().get().getSystem();
     }
 
     @Override
@@ -93,7 +99,7 @@ public class PatientServiceImpl implements PatientService {
     private void setIdentifiers(Patient patient, UserDto userDto) {
 
         //setting patient mrn
-        patient.addIdentifier().setSystem(fisProperties.getMrn().getCodeSystem())
+        patient.addIdentifier().setSystem(getCodeSystemByValue(userDto.getIdentifiers().get(),userDto.getMrn()))
                 .setUse(Identifier.IdentifierUse.OFFICIAL).setValue(userDto.getMrn());
 
         patient.setId(new IdType(userDto.getMrn()));
@@ -101,7 +107,7 @@ public class PatientServiceImpl implements PatientService {
         // setting ssn value
         userDto.getSocialSecurityNumber()
                 .map(String::trim)
-                .ifPresent(ssnValue -> patient.addIdentifier().setSystem(fisProperties.getSsn().getCodeSystem())
+                .ifPresent(ssnValue -> patient.addIdentifier().setSystem(getCodeSystemByValue(userDto.getIdentifiers().get(),userDto.getSocialSecurityNumber().get()))
                         .setValue(ssnValue));
     }
 

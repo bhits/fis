@@ -9,7 +9,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +32,6 @@ public class UserDto {
     @NotEmpty
     private String firstName;
 
-    @Past
     @NotNull
     private LocalDate birthDate;
 
