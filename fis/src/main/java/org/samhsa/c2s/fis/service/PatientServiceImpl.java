@@ -203,7 +203,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public String  getPatientResourceId(String patientMrnSystem,  String patientMrn){
 
-        Bundle patientSearchResponse = fhirClients.getOrDefault(Patient.class,fhirClients.get(Resource.class)).search()
+        Bundle patientSearchResponse = patientFhirClient.search()
                 .forResource(Patient.class)
                 .where(new TokenClientParam("identifier")
                         .exactly()
@@ -212,11 +212,11 @@ public class PatientServiceImpl implements PatientService {
                 .execute();
 
         if(patientSearchResponse == null || patientSearchResponse.getEntry().size() < 1){
-            throw new PatientNotFoundException("No patient found for the given MRN:" + patientMrn + " in FHIR Server" + fhirClients.getOrDefault(Patient.class,fhirClients.get(Resource.class)).getServerBase());
+            throw new PatientNotFoundException("No patient found for the given MRN:" + patientMrn + " in FHIR Server" + patientFhirClient.getServerBase());
         }
 
         if(patientSearchResponse.getEntry().size() > 1){
-            throw new MultiplePatientsFoundException("Multiple patients found for the given MRN:" + patientMrn + " in FHIR Server" + fhirClients.getOrDefault(Patient.class,fhirClients.get(Resource.class)).getServerBase());
+            throw new MultiplePatientsFoundException("Multiple patients found for the given MRN:" + patientMrn + " in FHIR Server" + patientFhirClient.getServerBase());
         }
 
         Patient patientObj = (Patient) patientSearchResponse.getEntry().get(0).getResource();
