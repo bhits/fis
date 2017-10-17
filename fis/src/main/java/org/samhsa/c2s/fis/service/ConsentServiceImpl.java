@@ -1,10 +1,15 @@
 package org.samhsa.c2s.fis.service;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.gclient.DateClientParam;
+import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
+import ca.uhn.fhir.rest.gclient.TokenClientParam;
 import ca.uhn.fhir.validation.FhirValidator;
 import ca.uhn.fhir.validation.ValidationResult;
 import lombok.extern.slf4j.Slf4j;
+import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Composition;
@@ -30,6 +35,7 @@ import org.samhsa.c2s.fis.service.exception.FHIRFormatErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,17 +61,19 @@ public class ConsentServiceImpl implements ConsentService {
 
     private final IGenericClient consentFhirClient;
 
-
     private final VssClient vssClient;
 
+    private IParser fhirJsonParser;
+
     @Autowired
-    public ConsentServiceImpl(FhirContext fhirContext, FhirValidator fhirValidator, Map<Class<? extends Resource>, IGenericClient> fhirClients, PatientService patientService, VssClient vssClient, FisProperties fisProperties) {
+    public ConsentServiceImpl(FhirContext fhirContext, FhirValidator fhirValidator, Map<Class<? extends Resource>, IGenericClient> fhirClients, PatientService patientService, VssClient vssClient, FisProperties fisProperties, IParser fhirJsonParser) {
         this.fhirContext = fhirContext;
         this.fhirValidator = fhirValidator;
         this.fhirClients = fhirClients;
         this.patientService = patientService;
         this.vssClient = vssClient;
         this.fisProperties=fisProperties;
+        this.fhirJsonParser=fhirJsonParser;
         this.consentFhirClient = fhirClients.getOrDefault(Consent.class, fhirClients.get(Resource.class));
 
     }
@@ -347,5 +355,22 @@ public class ConsentServiceImpl implements ConsentService {
                 .encodeResourceToString(fhirConsent));
         log.debug(fhirContext.newJsonParser().setPrettyPrint(true)
                 .encodeResourceToString(fhirConsent));
+    }
+
+
+    public String searchFhirConsents(String patientMrnSystem,  String patientMrn){
+        String patientResourceId =patientService.getPatientResourceId(patientMrnSystem,patientMrn);
+        String dateToday = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+        Bundle consentSearchResponse = consentFhirClient.search()
+                .forResource(Consent.class)
+                .where(new ReferenceClientParam("patient")
+                        .hasId(patientResourceId))
+                .where(new TokenClientParam("status").exactly().code("active"))
+                .where(new DateClientParam("period").afterOrEquals().second(dateToday))
+                .where(new DateClientParam("period").beforeOrEquals().second(dateToday))
+                .returnBundle(Bundle.class)
+                .execute();
+        return fhirJsonParser.setPrettyPrint(true).encodeResourceToString(consentSearchResponse);
     }
 }

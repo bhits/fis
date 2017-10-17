@@ -9,4 +9,6 @@ public interface ConsentService {
     String publishAndGetAttestedFhirConsent(ConsentDto consent, PatientDto patient);
 
     String revokeAndGetRevokedFhirConsent(ConsentDto consent, PatientDto patient);
+
+    String searchFhirConsents(String patientMrnSystem,  String patientMrn);
 }
