@@ -13,8 +13,8 @@ import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.samhsa.c2s.fis.config.FisProperties;
-import org.samhsa.c2s.fis.service.exception.MultiplePatientsFound;
-import org.samhsa.c2s.fis.service.exception.PatientNotFound;
+import org.samhsa.c2s.fis.service.exception.MultiplePatientsFoundException;
+import org.samhsa.c2s.fis.service.exception.PatientNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,13 +56,13 @@ public class ResourceServiceImpl implements ResourceService {
 
         if(patientSearchResponse == null || patientSearchResponse.getEntry().size() < 1){
             log.debug("No patient found in FHIR server with the given MRN: "  + patientIdentifierSystem + "|" + patientIdentifierValue);
-            throw new PatientNotFound("No patient found for the given MRN");
+            throw new PatientNotFoundException("No patient found for the given MRN");
         }
 
         if(patientSearchResponse.getEntry().size() > 1){
             log.warn("Multiple patients were found in FHIR server for the same given MRN: " + patientIdentifierSystem + "|" + patientIdentifierValue);
             log.debug("       URL of FHIR Server: " + fhirClients.getOrDefault(Patient.class, fhirClients.get(Resource.class)).getServerBase());
-            throw new MultiplePatientsFound("Multiple patients found in FHIR server with the given MRN");
+            throw new MultiplePatientsFoundException("Multiple patients found in FHIR server with the given MRN");
         }
 
         Patient patientObj = (Patient) patientSearchResponse.getEntry().get(0).getResource();

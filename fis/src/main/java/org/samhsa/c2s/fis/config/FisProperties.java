@@ -24,6 +24,17 @@ public class FisProperties {
 
         private Publish publish;
 
+        private Consent consent;
+
+        @Data
+        public static class Consent {
+            @NotNull
+            private boolean patientReference;
+
+            @NotBlank
+            private String codeSystem;
+        }
+
         @Data
         public static class Publish {
             @NotBlank

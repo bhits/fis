@@ -35,6 +35,7 @@ public class FhirServiceConfig {
         return fhirClients;
     }
 
+
     @Bean
     public IParser fhirXmlParser() {
         return fhirContext().newXmlParser();

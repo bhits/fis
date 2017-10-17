@@ -4,25 +4,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason ="Patient not found for the given MRN")
-public class PatientNotFound extends RuntimeException {
-    public PatientNotFound() {
+public class PatientNotFoundException extends RuntimeException {
+    public PatientNotFoundException() {
         super();
     }
 
-    public PatientNotFound(String message, Throwable cause,
-                           boolean enableSuppression, boolean writableStackTrace) {
+    public PatientNotFoundException(String message, Throwable cause,
+                                    boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public PatientNotFound(String message, Throwable cause) {
+    public PatientNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public PatientNotFound(String message) {
+    public PatientNotFoundException(String message) {
         super(message);
     }
 
-    public PatientNotFound(Throwable cause) {
+    public PatientNotFoundException(Throwable cause) {
         super(cause);
     }
 }

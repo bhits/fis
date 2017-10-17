@@ -2,16 +2,18 @@ package org.samhsa.c2s.fis.service;
 
 
 import org.hl7.fhir.dstu3.model.Patient;
-import org.samhsa.c2s.fis.service.dto.UserDto;
+import org.samhsa.c2s.fis.service.dto.PatientDto;
 
 public interface PatientService {
 
     /* converts UserDto to fhir patient object */
-    public Patient createFhirPatient(UserDto userDto);
+    public Patient createFhirPatient(PatientDto patientDto);
 
-    public void publishFhirPatient(UserDto userDto);
+    public String getPatientResourceId(String patientMrnSystem, String patientMrn);
 
-    public void updateFhirPatient(UserDto userDto);
+    public void publishFhirPatient(PatientDto patientDto);
+
+    public void updateFhirPatient(PatientDto patientDto);
 
 
 }

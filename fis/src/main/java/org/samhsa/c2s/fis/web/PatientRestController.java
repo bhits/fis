@@ -1,7 +1,7 @@
 package org.samhsa.c2s.fis.web;
 
 import org.samhsa.c2s.fis.service.PatientService;
-import org.samhsa.c2s.fis.service.dto.UserDto;
+import org.samhsa.c2s.fis.service.dto.PatientDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,13 +19,14 @@ public class PatientRestController {
     private PatientService patientService;
 
     @PostMapping
-    void publishFhirPatient(@Valid @RequestBody UserDto userDto) {
-        patientService.publishFhirPatient(userDto);
+    void publishFhirPatient(@Valid @RequestBody PatientDto patientDto) {
+        patientService.publishFhirPatient(patientDto);
     }
 
     @PutMapping
-    void updateFhirPatient(@Valid @RequestBody UserDto userDto) {
-        patientService.updateFhirPatient(userDto);
+    void updateFhirPatient(@Valid @RequestBody PatientDto patientDto) {
+
+        patientService.updateFhirPatient(patientDto);
     }
 
 }
