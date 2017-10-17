@@ -22,7 +22,7 @@ import org.hl7.fhir.dstu3.model.Practitioner;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.r4.model.codesystems.V3ActCode;
-import org.hl7.fhir.r4.model.codesystems.V3RoleClass;
+import org.hl7.fhir.r4.model.codesystems.V3ParticipationType;
 import org.samhsa.c2s.fis.config.FisProperties;
 import org.samhsa.c2s.fis.infrastructure.VssClient;
 import org.samhsa.c2s.fis.service.dto.ConsentDto;
@@ -192,7 +192,7 @@ public class ConsentServiceImpl implements ConsentService {
             if (sourceOrganizationList != null && sourceOrganizationList.size() > 0) {
                 sourceOrganizationList.stream().forEach((org) -> {
                     fhirConsent.getContained().add(org);
-                     fhirConsent.getOrganization().add(new Reference().setReference("#" + org.getId()));
+                     fhirConsent.getActor().add(getAuthorizedToShareActorComponent(org.getId()));
                 });
             }
         }
@@ -205,7 +205,7 @@ public class ConsentServiceImpl implements ConsentService {
             if (sourcePractitionerList != null && sourcePractitionerList.size() > 0) {
                 sourcePractitionerList.stream().forEach((individualProvider) -> {
                     fhirConsent.getContained().add(individualProvider);
-                    fhirConsent.getOrganization().add(new Reference().setReference("#" + individualProvider.getId()));
+                    fhirConsent.getActor().add(getAuthorizedToShareActorComponent(individualProvider.getId()));
                 });
             }
         }
@@ -219,7 +219,7 @@ public class ConsentServiceImpl implements ConsentService {
             if (recipientOrganizationList != null && recipientOrganizationList.size() > 0) {
                 recipientOrganizationList.stream().forEach((org) -> {
                     fhirConsent.getContained().add(org);
-                    fhirConsent.getActor().add(getActorComponentFromProviderId(org.getId()));
+                    fhirConsent.getActor().add(getSharingWithActorComponent(org.getId()));
                 });
             }
         }
@@ -233,7 +233,7 @@ public class ConsentServiceImpl implements ConsentService {
             if (recipientPractitionerList != null && recipientPractitionerList.size() > 0) {
                 recipientPractitionerList.stream().forEach((individualProvider) -> {
                     fhirConsent.getContained().add(individualProvider);
-                    fhirConsent.getActor().add(getActorComponentFromProviderId(individualProvider.getId()));
+                    fhirConsent.getActor().add(getSharingWithActorComponent(individualProvider.getId()));
                 });
             }
         }
@@ -341,12 +341,23 @@ public class ConsentServiceImpl implements ConsentService {
         return fhirPractitionerList;
     }
 
-    private Consent.ConsentActorComponent getActorComponentFromProviderId(String orgOrIndividualProviderId){
+    private Consent.ConsentActorComponent getAuthorizedToShareActorComponent(String orgOrIndividualProviderId){
+        //"From" providers(Role = INF)
         Consent.ConsentActorComponent actor = new Consent.ConsentActorComponent();
         actor.setReference(new Reference().setReference("#" + orgOrIndividualProviderId));
-        actor.setRole(new CodeableConcept().addCoding(new Coding(V3RoleClass.PROV.getSystem(),
-                V3RoleClass.PROV.toCode(),
-                V3RoleClass.PROV.getDisplay())));
+        actor.setRole(new CodeableConcept().addCoding(new Coding(V3ParticipationType.INF.getSystem(),
+                V3ParticipationType.INF.toCode(),
+                V3ParticipationType.INF.getDisplay())));
+        return actor;
+    }
+
+    private Consent.ConsentActorComponent getSharingWithActorComponent(String orgOrIndividualProviderId){
+        //"To" providers(Role = IRCP)
+        Consent.ConsentActorComponent actor = new Consent.ConsentActorComponent();
+        actor.setReference(new Reference().setReference("#" + orgOrIndividualProviderId));
+        actor.setRole(new CodeableConcept().addCoding(new Coding(V3ParticipationType.IRCP.getSystem(),
+                V3ParticipationType.IRCP.toCode(),
+                V3ParticipationType.IRCP.getDisplay())));
         return actor;
     }
 
