@@ -20,5 +20,5 @@ c2s:
         encoding: json
       consent:
         codeSystem: https://bhits.github.io/consent2share
-        # set patient in fhir consent refer to patient resource
+        # If 'patientReference' is true, then patient in a FHIR consent refers to a FHIR Patient Resource
         patientReference: false
