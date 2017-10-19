@@ -12,8 +12,8 @@ c2s:
     fhir:
       publish:
         serverUrl:
-          resource: http://bhitsdevhie01/hapi-fhir-jpaserver/baseStu3/
-        # configure only patient resource different with reource url
+          resource: http://bhitsdevhie01/hapi-fhir-jpaserver/baseDstu3
+          # Set 'patient' URL if the patient resource is available in another server different from the 'resource' server
           #patient: http://localhost:8470
         clientSocketTimeoutInMs: 768000
         use-create-for-update: false
