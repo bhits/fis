@@ -22,3 +22,11 @@ c2s:
         codeSystem: https://bhits.github.io/consent2share
         # If 'patientReference' is true, then patient in a FHIR consent refers to a FHIR Patient Resource
         patientReference: false
+---
+# updates configuration for docker environment
+spring.profiles: docker
+c2s:
+  fis:
+    fhir:
+      publish:
+        serverUrl: http://hapi-fhir.c2s.com:8080/hapi-fhir-jpaserver/baseDstu3
