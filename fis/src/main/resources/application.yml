@@ -29,4 +29,5 @@ c2s:
   fis:
     fhir:
       publish:
-        serverUrl: http://hapi-fhir.c2s.com:8080/hapi-fhir-jpaserver/baseDstu3
+        serverUrl:
+          resource: http://hapi-fhir.c2s.com:8080/hapi-fhir-jpaserver/baseDstu3
